@@ -1,4 +1,4 @@
-Feature: map raw sql to lightweight objects fetched from a sqlite database
+Feature: map raw sql to lightweight objects fetched from a mysql database
   Background:
     Given a connection to a mysql database
     And a table named foos with 100 records
