@@ -34,6 +34,7 @@ GEM
     linecache (0.46)
       rbx-require-relative (> 0.0.4)
     multi_json (1.3.6)
+    mysql (2.8.2)
     pg (0.14.1)
     rbx-require-relative (0.0.9)
     rspec (2.11.0)
@@ -57,6 +58,7 @@ PLATFORMS
 
 DEPENDENCIES
   cucumber
+  mysql (>= 2.8.1)
   pg (>= 0.11.0)
   rspec
   ruby-debug

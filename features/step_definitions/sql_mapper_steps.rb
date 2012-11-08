@@ -26,12 +26,13 @@ end
 Given /a connection to a mysql database/ do
   ActiveRecord::Base.establish_connection :adapter => 'mysql',
                                           :database => 'sql_mapper_test',
-                                          :username => 'mysql'
+                                          :username => 'root'
+  @conn = ActiveRecord::Base.connection
 end
 
 Given /a table named foos with (\d+) records/ do |count|
   @conn.execute "drop table foos" rescue nil
-  @conn.execute "create table foos (id serial, name varchar)"
+  @conn.execute "create table foos (id bigint, name varchar(100))"
   (0..count.to_i-1).each do |i|
     @conn.execute "insert into foos values (#{i}, 'foo_#{i}')"
   end
