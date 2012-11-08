@@ -16,7 +16,7 @@ module ActiveRecord
       end
 
       def map(name, sql, result_class=nil)
-        mapping = QueryMapping.new name, sql, (result_class || @result_class)
+        mapping = QueryMapping.new name, sql, result_class
         @queries[name] = mapping
       end
 
@@ -30,7 +30,7 @@ module ActiveRecord
       attr_reader :key
       attr_accessor :sql, :result_class
 
-      def initialize(key, sql, result_class=Context.result_class)
+      def initialize(key, sql, result_class=nil)
         @key = key
         @sql = sql
         @result_class = result_class
@@ -118,7 +118,7 @@ module ActiveRecord
         mapping = Context.instance.queries[opts[:query]]
         raise "No query named #{opts[:query]} found" if mapping.nil?
         sql = mapping.sql
-        result_class = mapping.result_class
+        result_class = mapping.result_class || result_class
       end
 
       if opts.include? :params
