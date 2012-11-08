@@ -1,6 +1,6 @@
-Feature: map raw sql to lightweight objects
+Feature: map raw sql to lightweight objects fetched from a sqlite database
   Background:
-    Given a connection to sqlite3 database :memory:
+    Given a connection to a postgres database
     And a table named foos with 100 records
 
   Scenario:
@@ -26,3 +26,11 @@ Feature: map raw sql to lightweight objects
   Scenario:
     When I fetch_one foo with id 1 using a query named a_foo
     Then my result should be a foo with id 1 coerced into a Struct
+
+  Scenario:
+    When I fetch_one foo with id 1 using inline sql and Hash result_class
+    Then my result should be a foo with id 1 coerced into a Hash
+
+  Scenario:
+    When I fetch_one foo with id 1 using a query named a_foo and Hash result_class
+    Then my result should be a foo with id 1 coerced into a Hash

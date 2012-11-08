@@ -11,13 +11,27 @@ Before do
   end
 end
 
-Given /a connection to (\w+) database (.+)$/ do |adapter, db|
-  ActiveRecord::Base.establish_connection :adapter => adapter, :database => db
+Given /a connection to sqlite database/ do 
+  ActiveRecord::Base.establish_connection :adapter => 'sqlite3', :database => ':memory:'
   @conn = ActiveRecord::Base.connection
 end
 
+Given /a connection to a postgres database/ do
+  ActiveRecord::Base.establish_connection :adapter => 'postgresql', 
+                                          :database => 'sql_mapper_test', 
+                                          :username => 'postgres'
+  @conn = ActiveRecord::Base.connection
+end
+
+Given /a connection to a mysql database/ do
+  ActiveRecord::Base.establish_connection :adapter => 'mysql',
+                                          :database => 'sql_mapper_test',
+                                          :username => 'mysql'
+end
+
 Given /a table named foos with (\d+) records/ do |count|
-  @conn.execute "create table foos (id serial, name string)"
+  @conn.execute "drop table foos" rescue nil
+  @conn.execute "create table foos (id serial, name varchar)"
   (0..count.to_i-1).each do |i|
     @conn.execute "insert into foos values (#{i}, 'foo_#{i}')"
   end
@@ -48,12 +62,24 @@ Then /my results should have (\d+) foos each coerced into a (\w+)/ do |count, ty
   end
 end
 
-When /I fetch_one foo with id (\d+) using inline sql/ do |id|
+When /^I fetch_one foo with id (\d+) using inline sql$/ do |id|
   @results = ActiveRecord::SqlMapper.fetch_one :query => "select * from foos where id = ?", :params => id.to_i
 end
 
-When /I fetch_one foo with id (\d+) using a query named (\w+)/ do |id, query_name|
+When /^I fetch_one foo with id (\d+) using a query named (\w+)$/ do |id, query_name|
   @results = ActiveRecord::SqlMapper.fetch_one :query => query_name.to_sym, :params => id.to_i
+end
+
+When /^I fetch_one foo with id (\d+) using inline sql and (\w+) result_class$/ do |id, result_class|
+  @results = ActiveRecord::SqlMapper.fetch_one :query => "select * from foos where id = ?", 
+                                               :params => id.to_i, 
+                                               :result_class => result_class.constantize
+end
+
+When /^I fetch_one foo with id (\d+) using a query named (\w+) and (\w+) result_class$/ do |id, query_name, result_class|
+  @results = ActiveRecord::SqlMapper.fetch_one :query => query_name.to_sym, 
+                                               :params => id.to_i, 
+                                               :result_class => result_class.constantize
 end
 
 Then /my result should be a foo with id (\d+) coerced into a (\w+)/ do |id, type|
@@ -63,10 +89,10 @@ end
 def check_result(result, type, id)
   result.kind_of?(type.constantize).should == true
   if result.kind_of? Hash
-    result[:id].should == id.to_i
+    result[:id].to_i.should == id.to_i
     result[:name].should == "foo_#{id}"
   else
-    result.id.should == id.to_i
+    result.id.to_i.should == id.to_i
     result.name.should == "foo_#{id}"
   end
 end
