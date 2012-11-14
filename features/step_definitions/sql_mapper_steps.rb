@@ -4,10 +4,21 @@ require 'active_record'
 require 'ostruct'
 load './lib/sql_mapper.rb'
 
+class Foo
+  attr_reader :id, :name
+
+  def initialize(id, name)
+    @id = id
+    @name = name
+  end
+end
+
 Before do
   ActiveRecord::SqlMapper.config do
     map :all_foos, "select * from foos order by id"
     map :a_foo, "select * from foos where id = ?"
+    map :all_foos_as_foos, "select * from foos order by id", Foo
+    map :a_foo_as_foo, "select * from foos where id = ?", Foo
   end
 end
 
