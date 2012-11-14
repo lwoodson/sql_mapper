@@ -14,7 +14,7 @@ the data.
 If all of the above is true, sql_mapper can help leverage raw sql to provide
 an order of magnitude performance improvement over ActiveRecord's existing
 fetch capabilities while still coercing the results into objects for ease of
-use after fetching.
+use after fetching (with 100,000 rows fetched).
 
 Why is ActiveRecord slow in these cases?  Read more here 
 http://merbist.com/2012/02/23/quick-dive-into-ruby-orm-object-initialization/
@@ -35,15 +35,16 @@ create table Foos (
 
 ### Inline SQL ###
 
-You can fetch results using raw inline SQL.  The results will be marshalled
-into structs with attributes matching the column names in your query by
-default.
+You can fetch results using raw inline SQL.  By default, The results will be 
+marshalled into structs with attributes matching the column names in your
+query.
 
 ```ruby
 foos = ActiveRecord::SqlMapper.fetch :query => "select * from foos"
 ```
 
-The above has a 10x performance increase over standard ActiveRecord querying:
+This is analogous to, but more performant than, using ActiveRecord's all
+method.
 
 ```ruby
 foos = Foo.all
@@ -63,8 +64,8 @@ end
 
 ### Single Result Shortcut ###
 
-A fetch_one shortcut exists to fetch a single result.  All of the other options
-and behavior apply to both fetch and fetch_one.
+A fetch_one shortcut exists to fetch a single result.  All options and behavior 
+apply to both fetch and fetch_one.
 
 ```ruby
 foo = ActiveRecord::SqlMapper.fetch_one :query => "select * from foos limit 1"
@@ -88,7 +89,8 @@ foos = ActiveRecord::SqlMapper.fetch :query => :all_foos
 ### Parameters ###
 
 SQL queries can contain parameters using ? or :name placeholders that you are
-already familiar with from ActiveRecord.  These can be used in named queries.
+already familiar with from ActiveRecord.  These can be used in both inline and
+named queries.
 
 ```ruby
 sql = "select * from foos where id = ?"
@@ -135,7 +137,7 @@ sql = "select * from foos where id = ?"
 foo = ActiveRecord::SqlMapper.fetch_one :query => sql,
                                         :params => 1,
                                         :result_class => Foo
-puts foo
+puts foo.to_s
 ```
 
 Result classes can also be specified in the configuration at either a global
