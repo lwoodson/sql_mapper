@@ -1,4 +1,4 @@
-= sql_mapper
+# sql_mapper #
 
 An extension for ActiveRecord to improve read performance for large data sets 
 at the sacrifice of some AR magic.
@@ -21,119 +21,141 @@ http://merbist.com/2012/02/23/quick-dive-into-ruby-orm-object-initialization/
 
 Why raw sql?  Its a data fetching DSL.
 
-Tests have been run and verified with ActiveRecord 3.2, 2.3.8, 2.3.5
-
-== Examples
+## Examples ##
 
 All of the examples assume we have a table named <tt>Foos</tt> defined as
 follows:
 
-  create table Foos (
-    id serial,
-    name string
-  );
+```sql
+create table Foos (
+  id serial,
+  name string
+);
+```
 
-=== Inline SQL
+### Inline SQL ###
 
 You can fetch results using raw inline SQL.  The results will be marshalled
 into structs with attributes matching the column names in your query by
 default.
 
-  foos = ActiveRecord::SqlMapper.fetch :query => "select * from foos"
+```ruby
+foos = ActiveRecord::SqlMapper.fetch :query => "select * from foos"
+```
 
 The above has a 10x performance increase over standard ActiveRecord querying:
 
-  foos = Foo.all
+```ruby
+foos = Foo.all
+```
 
-=== Accessing Column Values
+### Accessing Column Values ###
 
 As the result objects are structs, you can access column data through the object 
 using column names and dot notation.
 
-  foos = ActiveRecord::SqlMapper.fetch :query => "select * from foos"
-  foos.each do |foo|
-    puts "#{foo.id}: #{foo.name}"
-  end
+```ruby
+foos = ActiveRecord::SqlMapper.fetch :query => "select * from foos"
+foos.each do |foo|
+  puts "#{foo.id}: #{foo.name}"
+end
+```
 
-=== Single Result Shortcut
+### Single Result Shortcut ###
 
 A fetch_one shortcut exists to fetch a single result.  All of the other options
 and behavior apply to both fetch and fetch_one.
 
-  foo = ActiveRecord::SqlMapper.fetch_one :query => "select * from foos limit 1"
+```ruby
+foo = ActiveRecord::SqlMapper.fetch_one :query => "select * from foos limit 1"
+```
 
-=== Named Queries
+### Named Queries ###
 
 SQL queries can be mapped to logical names within a configuration block,
 allowing you to pass the logical name to the fetch method and keeping the sql
 compartmentalized within your app.  In a rails application, this configuration
 should be put in an initializer.
 
-  ActiveRecord::SqlMapper.config do
-    map :all_foos, "select * from foos"
-  end
+```ruby
+ActiveRecord::SqlMapper.config do
+  map :all_foos, "select * from foos"
+end
 
-  foos = ActiveRecord::SqlMapper.fetch :query => :all_foos
+foos = ActiveRecord::SqlMapper.fetch :query => :all_foos
+```
 
-=== Parameters
+### Parameters ###
 
 SQL queries can contain parameters using ? or :name placeholders that you are
 already familiar with from ActiveRecord.  These can be used in named queries.
 
-  sql = "select * from foos where id = ?"
-  foo = ActiveRecord::SqlMapper.fetch_one :query => sql, :params => 1
-  foo = ActiveRecord::SqlMapper.fetch_one :query => sql, :params => [1]
-  
-  sql = "select * from foos where id = :id"
-  foo = ActiveRecord::SqlMapper.fetch_one :query => sql, :params => {:id => 1}
+```ruby
+sql = "select * from foos where id = ?"
+foo = ActiveRecord::SqlMapper.fetch_one :query => sql, :params => 1
+foo = ActiveRecord::SqlMapper.fetch_one :query => sql, :params => [1]
 
-=== Result Classes
+sql = "select * from foos where id = :id"
+foo = ActiveRecord::SqlMapper.fetch_one :query => sql, :params => {:id => 1}
+```
+
+### Result Classes ###
 
 By default, sql mapper results are structs, but you can also use hashes by
 specifying the result class to fetch or fetch_one.  
 
-  sql = "select * from foos where id = ?"
-  foo = ActiveRecord::SqlMapper.fetch :query => sql,
-                                       :params => 1,
-                                       :result_class => Hash
-  puts foo[:id]
-  puts foo[:name]
+```ruby
+sql = "select * from foos where id = ?"
+foo = ActiveRecord::SqlMapper.fetch :query => sql,
+                                     :params => 1,
+                                     :result_class => Hash
+puts foo[:id]
+puts foo[:name]
+```
 
 You can also use any arbitrary class for results as long as it has an
 initializer that contains arguments for all columns in the same order.  This
 can be useful if you want behavior attached to your results.
 
-  class Foo
-    attr_reader :id, :name
+```ruby
+class Foo
+  attr_reader :id, :name
 
-    def initialize(id, name)
-      @id = id
-      @name = name
-    end
-
-    def to_s
-      "Foo(#{id}, #{name})"
-    end
+  def initialize(id, name)
+    @id = id
+    @name = name
   end
 
-  sql = "select * from foos where id = ?"
-  foo = ActiveRecord::SqlMapper.fetch_one :query => sql,
-                                          :params => 1,
-                                          :result_class => Foo
-  puts foo
+  def to_s
+    "Foo(#{id}, #{name})"
+  end
+end
+
+sql = "select * from foos where id = ?"
+foo = ActiveRecord::SqlMapper.fetch_one :query => sql,
+                                        :params => 1,
+                                        :result_class => Foo
+puts foo
+```
 
 Result classes can also be specified in the configuration at either a global
 or per-query level.
 
-  ActiveRecord::SqlMapper.config do
-    result_class Hash
-    map :all_foos, "select * from foos", Foo
-  end
+```ruby
+ActiveRecord::SqlMapper.config do
+  result_class Hash
+  map :all_foos, "select * from foos", Foo
+end
+```
 
-== More Examples
+## More Examples ##
 
 See examples of sql_mapper use at https://gist.github.com/4000974
 
-== Contributing
+## Versions ##
+Tests have been run and verified with ActiveRecord 3.2, 2.3.8, 2.3.5.  Let me
+know if you have any problems with the gem using active record > 2.3.5.
 
-Fork it, hack it, test it, then I'll pull it.
+## Contributing ##
+
+Fork it, hack it, test it, then I'll pull it if I like it.
