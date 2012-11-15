@@ -12,9 +12,22 @@ The basic use case for SQL Mapper is:
 the data.
 
 If all of the above is true, sql_mapper can help leverage raw sql to provide
-an order of magnitude performance improvement over ActiveRecord's existing
-fetch capabilities while still coercing the results into objects for ease of
-use after fetching (with 100,000 rows fetched).
+large performance gains over ActiveRecord's existing fetch capabilities while
+still coercing the results into objects for ease of use.  How much more
+performant?  My benchmarks show greater than an order of magnitude increase in
+performance when fetching 100,000 rows of data.
+
+```
+1.9.3p194 :036 >   prof 'Foo.all' do
+1.9.3p194 :037 >       Foo.all
+1.9.3p194 :038?>   end
+Foo.all: 7492.341262
+
+1.9.3p194 :043 >   prof 'SqlMapper' do
+1.9.3p194 :044 >       ActiveRecord::SqlMapper.fetch :query => "select * from foos"
+1.9.3p194 :045?>   end
+SqlMapper: 474.20788899999997
+```
 
 Why is ActiveRecord slow in these cases?  Read more here 
 http://merbist.com/2012/02/23/quick-dive-into-ruby-orm-object-initialization/

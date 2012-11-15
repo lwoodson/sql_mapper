@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'sql_mapper'
-  s.version = '1.0.1'
+  s.version = '1.0.2'
   s.date = '2012-11-01'
   s.summary = """
   ActiveRecord extension that provides large performance improvements
