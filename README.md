@@ -173,7 +173,7 @@ know if you have any problems with the gem using active record > 2.3.5.
 
 ## FAQ ##
 
-*Q: Am I missing something? Doesn't Arel already do this?*
+**Q: Am I missing something? Doesn't Arel already do this?**
 
 A: Arel is an abstract syntax tree for generating SQL. Sql_mapper is a very 
 simple extension to ActiveRecord that allows you to:
@@ -183,8 +183,8 @@ simple extension to ActiveRecord that allows you to:
 3. Avoid the performance overhead involved with instantiating full-blown 
 ActiveRecord::Base instances. 
 
-*Q: How is this different from doing ActiveRecord::Base.connection.select_all() 
-or whatever?*
+**Q: How is this different from doing ActiveRecord::Base.connection.select_all() 
+or whatever?**
 
 A: Its not very different, and there is probably no reason to refactor existing
 code using that method.  There are, however, reasons to use sql_mapper instead
