@@ -174,19 +174,36 @@ know if you have any problems with the gem using active record > 2.3.5.
 ## FAQ ##
 
 Q: Am I missing something? Doesn't Arel already do this?
-A: Arel is an abstract syntax tree for generating SQL. Sql_mapper is a very simple extension to ActiveRecord that allows you to:
+
+A: Arel is an abstract syntax tree for generating SQL. Sql_mapper is a very 
+simple extension to ActiveRecord that allows you to:
+
 1. Use native sql for the best possible tuned performance in read-only queries.
 2. Coerce the data into objects without having to do it yourself.
-3. Avoid the performance overhead involved with instantiating full-blown ActiveRecord::Base instances. 
+3. Avoid the performance overhead involved with instantiating full-blown 
+ActiveRecord::Base instances. 
 
-Q: How is this different from doing ActiveRecord::Base.connection.select_all() or whatever?
+Q: How is this different from doing ActiveRecord::Base.connection.select_all() 
+or whatever?
+
 A: Its not very different, and there is probably no reason to refactor existing
 code using that method.  There are, however, reasons to use sql_mapper instead
 of that approach if confronted with the issues it is designed to solve:
-1. select_all has different results depending on which version of active record you are using (array of arrays or array of hashes).
+
+1. select_all has different results depending on which version of active record 
+you are using (array of arrays or array of hashes).
 2. person.name > person[0] for all sorts of reasons.
-3. person["name"] is better, but a departure from how you would access data via dot syntax with full blown active record objects. For instance, if you are tasked with "report A takes 10 minutes to generate! FIX IT!" and the code to generate report A is using standard active record objects, it will output each person's name with person.name. You would either have to refactor every place you access data to use the hash syntax, or coerce the data into an object for dot syntax. Sql_mapper does the coercion for you in a really efficient way and its DRY (really DRAAEHDA -- don't repeat anything anyone else has done already).
-4. Also, Named queries with sql_mapper allow you to have a logical name for the query that is probably easier to grok at first glance than a really complex query that is 100 lines long and mixed in with your ruby source.
+3. person["name"] is better, but a departure from how you would access data via 
+dot syntax with full blown active record objects. For instance, if you are 
+tasked with "report A takes 10 minutes to generate! FIX IT!" and the code to 
+generate report A is using standard active record objects, it will output each 
+person's name with person.name. You would either have to refactor every place 
+you access data to use the hash syntax, or coerce the data into an object for 
+dot syntax. Sql_mapper does the coercion for you in a really efficient way and 
+its DRY (really DRAAEHDA -- don't repeat anything anyone else has done already).
+4. Also, Named queries with sql_mapper allow you to have a logical name for the 
+query that is probably easier to grok at first glance than a really complex 
+query that is 100 lines long and mixed in with your ruby source.
 ```ruby
 ActiveRecord::SqlMapper.fetch :data_for_invoice_report
 
